@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 # CHEATSHEET
 #     array=(1 2 3)                   // Creation. 3 elements
@@ -7,12 +7,17 @@
 
 echo "Arrays Example"
 
-print_array() 
-{
-    local array_arg=($@)
+# Bash has no native support for passing arrays to functions.
+# Instead all entries in the array must be expanded, and then
+# re-created into an array inside the function.
+#
+# At all times, use "" around the array elements, to prevent
+# word-splitting (i.e. maintain any special characters).
+print_array() {
+    local array_arg=("$@")
 
     # Iterate over array
-    for element in ${array_arg[@]}
+    for element in "${array_arg[@]}"
     do
         echo $element
     done
@@ -36,4 +41,13 @@ echo "Array elements: " ${#array[@]}
 # Add elements
 array+=(10)
 
-print_array "${array[@]}"
+# Passing an array like this (without qoutes) performs word-splitting (IFS).
+print_array ${array[@]}
+
+array_of_text=("hello there" "some address" "more info to come")
+
+# Expands the elements around word-boundaries (i.e. 8 items)
+print_array ${array_of_text[@]}
+
+# Preserves the elements with special characters (i.e. 3 items)
+print_array "${array_of_text[@]}"
